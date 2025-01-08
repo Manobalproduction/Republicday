@@ -13,10 +13,9 @@
       font-family: Arial, sans-serif;
     }
 
-    #capture-btn {
+    #capture-btn, #switch-camera-btn {
       position: absolute;
       top: 20px;
-      left: 20px;
       padding: 10px 20px;
       background-color: rgba(0, 0, 0, 0.7);
       color: white;
@@ -26,7 +25,15 @@
       font-size: 16px;
     }
 
-    #capture-btn:hover {
+    #capture-btn {
+      left: 20px;
+    }
+
+    #switch-camera-btn {
+      left: 140px;
+    }
+
+    button:hover {
       background-color: rgba(255, 255, 255, 0.9);
       color: black;
     }
@@ -34,7 +41,7 @@
 </head>
 <body>
   <!-- A-Frame Scene -->
-  <a-scene embedded arjs="sourceType: webcam; facingMode: user;" renderer="antialias: true;">
+  <a-scene embedded arjs="sourceType: webcam; facingMode: user;" renderer="antialias: true;" id="scene">
     <!-- Camera -->
     <a-camera position="0 0 0" look-controls="enabled: true"></a-camera>
 
@@ -43,16 +50,19 @@
       id="celebrity" 
       src="celebrity.png" 
       scale="1.5 2 1" 
-      position="0 0 -2">
+      position="-1 0 -2"> <!-- Positioned to the left side -->
     </a-image>
   </a-scene>
 
-  <!-- Capture Button -->
+  <!-- Buttons -->
   <button id="capture-btn">Capture Selfie</button>
+  <button id="switch-camera-btn">Switch Camera</button>
 
   <script>
+    let isFrontCamera = true; // Track which camera is currently active
+
+    // Capture Selfie
     document.getElementById("capture-btn").addEventListener("click", function () {
-      // Access the canvas of the A-Frame scene
       const scene = document.querySelector("a-scene");
       const canvas = scene.querySelector("canvas");
 
@@ -64,6 +74,20 @@
       link.href = image;
       link.download = "selfie.png"; // Save file as selfie.png
       link.click();
+    });
+
+    // Switch Camera
+    document.getElementById("switch-camera-btn").addEventListener("click", function () {
+      const scene = document.getElementById("scene");
+
+      // Toggle the facingMode between 'user' (front) and 'environment' (back)
+      isFrontCamera = !isFrontCamera;
+
+      // Update the AR.js scene configuration
+      scene.setAttribute(
+        "arjs",
+        `sourceType: webcam; facingMode: ${isFrontCamera ? "user" : "environment"};`
+      );
     });
   </script>
 </body>
