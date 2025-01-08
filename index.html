@@ -42,15 +42,15 @@
 <body>
   <!-- A-Frame Scene -->
   <a-scene embedded arjs="sourceType: webcam; facingMode: user;" renderer="antialias: true;" id="scene">
-    <!-- Camera -->
-    <a-camera position="0 0 0" look-controls="enabled: true"></a-camera>
+    <!-- Camera with Adjusted FOV -->
+    <a-camera position="0 0 0" fov="60" look-controls="enabled: true"></a-camera>
 
     <!-- Celebrity PNG Image -->
     <a-image 
       id="celebrity" 
       src="celebrity.png" 
       scale="1.5 2 1" 
-      position="-1 0 -2"> <!-- Positioned to the left side -->
+      position="-1 0 -3"> <!-- Adjusted position to be further back -->
     </a-image>
   </a-scene>
 
