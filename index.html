@@ -3,91 +3,88 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AR Selfie with Celebrity</title>
-  <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/gh/jeromeetienne/AR.js/aframe/build/aframe-ar.js"></script>
+  <title>AR Model Viewer</title>
+  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
   <style>
     body {
       margin: 0;
-      overflow: hidden;
       font-family: Arial, sans-serif;
     }
-
-    #capture-btn, #switch-camera-btn {
-      position: absolute;
-      top: 20px;
+    model-viewer {
+      width: 100%;
+      height: 80vh;
+    }
+    #controls {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px;
+      background: #f4f4f4;
+    }
+    select, button {
+      margin: 0 10px;
       padding: 10px 20px;
-      background-color: rgba(0, 0, 0, 0.7);
-      color: white;
-      border: none;
+      font-size: 16px;
+      border: 1px solid #ccc;
       border-radius: 5px;
       cursor: pointer;
-      font-size: 16px;
     }
-
-    #capture-btn {
-      left: 20px;
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
     }
-
-    #switch-camera-btn {
-      left: 140px;
-    }
-
     button:hover {
-      background-color: rgba(255, 255, 255, 0.9);
-      color: black;
+      background: #0056b3;
     }
   </style>
 </head>
 <body>
-  <!-- A-Frame Scene -->
-  <a-scene embedded arjs="sourceType: webcam; facingMode: user;" renderer="antialias: true;" id="scene">
-    <!-- Camera with Adjusted FOV -->
-    <a-camera position="0 0 0" fov="60" look-controls="enabled: true"></a-camera>
-
-    <!-- Celebrity PNG Image -->
-    <a-image 
-      id="celebrity" 
-      src="celebrity.png" 
-      scale="1.5 2 1" 
-      position="-1 0 -3"> <!-- Adjusted position to be further back -->
-    </a-image>
-  </a-scene>
-
-  <!-- Buttons -->
-  <button id="capture-btn">Capture Selfie</button>
-  <button id="switch-camera-btn">Switch Camera</button>
+  <div id="controls">
+    <select id="model-selector">
+      <option value="dino">Dino</option>
+      <option value="flag">Flag</option>
+    </select>
+    <button id="ar-button">View in AR</button>
+  </div>
+  
+  <model-viewer 
+    src="dino.glb" 
+    ios-src="dino.usdz"
+    ar 
+    ar-modes="webxr scene-viewer quick-look" 
+    camera-controls 
+    tone-mapping="neutral" 
+    poster="poster.webp" 
+    shadow-intensity="1.74" 
+    exposure="1"
+    field-of-view="30deg"
+    autoplay
+    animation-name="*"
+    id="viewer">
+  </model-viewer>
 
   <script>
-    let isFrontCamera = true; // Track which camera is currently active
+    const modelViewer = document.getElementById('viewer');
+    const modelSelector = document.getElementById('model-selector');
+    const arButton = document.getElementById('ar-button');
 
-    // Capture Selfie
-    document.getElementById("capture-btn").addEventListener("click", function () {
-      const scene = document.querySelector("a-scene");
-      const canvas = scene.querySelector("canvas");
+    // Model sources
+    const models = {
+      dino: { src: 'dino.glb', ios: 'dino.usdz' },
+      flag: { src: 'flag.glb', ios: 'flag.usdz' }
+    };
 
-      // Convert the current frame to an image
-      const image = canvas.toDataURL("image/png");
-
-      // Create a link to download the image
-      const link = document.createElement("a");
-      link.href = image;
-      link.download = "selfie.png"; // Save file as selfie.png
-      link.click();
+    // Update model-viewer when model is changed
+    modelSelector.addEventListener('change', (event) => {
+      const selectedModel = event.target.value;
+      modelViewer.setAttribute('src', models[selectedModel].src);
+      modelViewer.setAttribute('ios-src', models[selectedModel].ios);
     });
 
-    // Switch Camera
-    document.getElementById("switch-camera-btn").addEventListener("click", function () {
-      const scene = document.getElementById("scene");
-
-      // Toggle the facingMode between 'user' (front) and 'environment' (back)
-      isFrontCamera = !isFrontCamera;
-
-      // Update the AR.js scene configuration
-      scene.setAttribute(
-        "arjs",
-        `sourceType: webcam; facingMode: ${isFrontCamera ? "user" : "environment"};`
-      );
+    // Activate AR when "View in AR" is clicked
+    arButton.addEventListener('click', () => {
+      modelViewer.activateAR();
     });
   </script>
 </body>
